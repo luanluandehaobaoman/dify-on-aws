@@ -1,0 +1,1022 @@
+{
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "VPC settings"
+          },
+          "Parameters": ["IPv4CIDR"]
+        }
+      ],
+      "ParameterLabels": {
+        "IPv4CIDR": {
+          "default": "The Prefix of IPv4 CIDR"
+        }
+      }
+    }
+  },
+  "Parameters": {
+    "IPv4CIDR": {
+      "Type": "String",
+      "Default": "10.1",
+      "AllowedPattern": "^(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+      "Description": "The subnet CIDR prefix, such as 10.1, defaults to a subnet mask of /16."
+    }
+  },
+  "Resources": {
+    "VPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": { "Fn::Join": ["", [{ "Ref": "IPv4CIDR" }, ".0.0/16"]] },
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "InstanceTenancy": "default",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Resource"
+      }
+    },
+    "VPCPublicSubnetSubnet1Subnet5B243AFA": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "CidrBlock": { "Fn::Join": ["", [{ "Ref": "IPv4CIDR" }, ".0.0/24"]] },
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public Subnet"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public"
+          },
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC/Public SubnetSubnet1"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Public SubnetSubnet1/Subnet"
+      }
+    },
+    "VPCPublicSubnetSubnet1RouteTableF5AA07ED": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC/Public SubnetSubnet1"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Public SubnetSubnet1/RouteTable"
+      }
+    },
+    "VPCPublicSubnetSubnet1RouteTableAssociation653CE494": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPublicSubnetSubnet1RouteTableF5AA07ED"
+        },
+        "SubnetId": {
+          "Ref": "VPCPublicSubnetSubnet1Subnet5B243AFA"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Public SubnetSubnet1/RouteTableAssociation"
+      }
+    },
+    "VPCPublicSubnetSubnet1DefaultRouteDE35AA18": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "VPCIGWB7E252D3"
+        },
+        "RouteTableId": {
+          "Ref": "VPCPublicSubnetSubnet1RouteTableF5AA07ED"
+        }
+      },
+      "DependsOn": ["VPCVPCGW99B986DC"],
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Public SubnetSubnet1/DefaultRoute"
+      }
+    },
+    "VPCPublicSubnetSubnet1EIP02361F61": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC/Public SubnetSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Public SubnetSubnet1/EIP"
+      }
+    },
+    "VPCPublicSubnetSubnet1NATGateway1F72B7FC": {
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "AllocationId": {
+          "Fn::GetAtt": ["VPCPublicSubnetSubnet1EIP02361F61", "AllocationId"]
+        },
+        "SubnetId": {
+          "Ref": "VPCPublicSubnetSubnet1Subnet5B243AFA"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC/Public SubnetSubnet1"
+          }
+        ]
+      },
+      "DependsOn": [
+        "VPCPublicSubnetSubnet1DefaultRouteDE35AA18",
+        "VPCPublicSubnetSubnet1RouteTableAssociation653CE494"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Public SubnetSubnet1/NATGateway"
+      }
+    },
+    "VPCPublicSubnetSubnet2Subnet7ECA4683": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "CidrBlock": { "Fn::Join": ["", [{ "Ref": "IPv4CIDR" }, ".1.0/24"]] },
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public Subnet"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public"
+          },
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC/Public SubnetSubnet2"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Public SubnetSubnet2/Subnet"
+      }
+    },
+    "VPCPublicSubnetSubnet2RouteTableFA80824D": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC/Public SubnetSubnet2"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Public SubnetSubnet2/RouteTable"
+      }
+    },
+    "VPCPublicSubnetSubnet2RouteTableAssociation76BDD1AB": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPublicSubnetSubnet2RouteTableFA80824D"
+        },
+        "SubnetId": {
+          "Ref": "VPCPublicSubnetSubnet2Subnet7ECA4683"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Public SubnetSubnet2/RouteTableAssociation"
+      }
+    },
+    "VPCPublicSubnetSubnet2DefaultRouteDC2FA244": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "VPCIGWB7E252D3"
+        },
+        "RouteTableId": {
+          "Ref": "VPCPublicSubnetSubnet2RouteTableFA80824D"
+        }
+      },
+      "DependsOn": ["VPCVPCGW99B986DC"],
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Public SubnetSubnet2/DefaultRoute"
+      }
+    },
+    "VPCPrivateSubnetSubnet1Subnet7C0C3BA8": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "CidrBlock": { "Fn::Join": ["", [{ "Ref": "IPv4CIDR" }, ".2.0/24"]] },
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private Subnet"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private"
+          },
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC/Private SubnetSubnet1"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Private SubnetSubnet1/Subnet"
+      }
+    },
+    "VPCPrivateSubnetSubnet1RouteTable1A8C9EC2": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC/Private SubnetSubnet1"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Private SubnetSubnet1/RouteTable"
+      }
+    },
+    "VPCPrivateSubnetSubnet1RouteTableAssociation8903B9F7": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPrivateSubnetSubnet1RouteTable1A8C9EC2"
+        },
+        "SubnetId": {
+          "Ref": "VPCPrivateSubnetSubnet1Subnet7C0C3BA8"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Private SubnetSubnet1/RouteTableAssociation"
+      }
+    },
+    "VPCPrivateSubnetSubnet1DefaultRoute93F54653": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "VPCPublicSubnetSubnet1NATGateway1F72B7FC"
+        },
+        "RouteTableId": {
+          "Ref": "VPCPrivateSubnetSubnet1RouteTable1A8C9EC2"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Private SubnetSubnet1/DefaultRoute"
+      }
+    },
+    "VPCPrivateSubnetSubnet2Subnet08BBFA55": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "CidrBlock": { "Fn::Join": ["", [{ "Ref": "IPv4CIDR" }, ".3.0/24"]] },
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private Subnet"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private"
+          },
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC/Private SubnetSubnet2"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Private SubnetSubnet2/Subnet"
+      }
+    },
+    "VPCPrivateSubnetSubnet2RouteTableE320E269": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC/Private SubnetSubnet2"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Private SubnetSubnet2/RouteTable"
+      }
+    },
+    "VPCPrivateSubnetSubnet2RouteTableAssociation22E8EF83": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPrivateSubnetSubnet2RouteTableE320E269"
+        },
+        "SubnetId": {
+          "Ref": "VPCPrivateSubnetSubnet2Subnet08BBFA55"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Private SubnetSubnet2/RouteTableAssociation"
+      }
+    },
+    "VPCPrivateSubnetSubnet2DefaultRoute46E1FDA8": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "VPCPublicSubnetSubnet1NATGateway1F72B7FC"
+        },
+        "RouteTableId": {
+          "Ref": "VPCPrivateSubnetSubnet2RouteTableE320E269"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Private SubnetSubnet2/DefaultRoute"
+      }
+    },
+    "VPCIsolatedSubnetSubnet1Subnet2C56B669": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "CidrBlock": { "Fn::Join": ["", [{ "Ref": "IPv4CIDR" }, ".4.0/24"]] },
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Isolated Subnet"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Isolated"
+          },
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC/Isolated SubnetSubnet1"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Isolated SubnetSubnet1/Subnet"
+      }
+    },
+    "VPCIsolatedSubnetSubnet1RouteTableB955F076": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC/Isolated SubnetSubnet1"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Isolated SubnetSubnet1/RouteTable"
+      }
+    },
+    "VPCIsolatedSubnetSubnet1RouteTableAssociationD25EE931": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCIsolatedSubnetSubnet1RouteTableB955F076"
+        },
+        "SubnetId": {
+          "Ref": "VPCIsolatedSubnetSubnet1Subnet2C56B669"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Isolated SubnetSubnet1/RouteTableAssociation"
+      }
+    },
+    "VPCIsolatedSubnetSubnet2Subnet2B8BABEF": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "AvailabilityZone": {
+          "Fn::Select": [
+            1,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        },
+        "CidrBlock": { "Fn::Join": ["", [{ "Ref": "IPv4CIDR" }, ".5.0/24"]] },
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Isolated Subnet"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Isolated"
+          },
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC/Isolated SubnetSubnet2"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Isolated SubnetSubnet2/Subnet"
+      }
+    },
+    "VPCIsolatedSubnetSubnet2RouteTable27F52BE5": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC/Isolated SubnetSubnet2"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Isolated SubnetSubnet2/RouteTable"
+      }
+    },
+    "VPCIsolatedSubnetSubnet2RouteTableAssociationA6DDE48B": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCIsolatedSubnetSubnet2RouteTable27F52BE5"
+        },
+        "SubnetId": {
+          "Ref": "VPCIsolatedSubnetSubnet2Subnet2B8BABEF"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/Isolated SubnetSubnet2/RouteTableAssociation"
+      }
+    },
+    "VPCIGWB7E252D3": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ThreeLayerSubnets/VPC"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/IGW"
+      }
+    },
+    "VPCVPCGW99B986DC": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "InternetGatewayId": {
+          "Ref": "VPCIGWB7E252D3"
+        },
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/VPCGW"
+      }
+    },
+    "VPCS3Endpoint18C9C7CA": {
+      "Type": "AWS::EC2::VPCEndpoint",
+      "Properties": {
+        "RouteTableIds": [
+          {
+            "Ref": "VPCPrivateSubnetSubnet1RouteTable1A8C9EC2"
+          },
+          {
+            "Ref": "VPCPrivateSubnetSubnet2RouteTableE320E269"
+          },
+          {
+            "Ref": "VPCPublicSubnetSubnet1RouteTableF5AA07ED"
+          },
+          {
+            "Ref": "VPCPublicSubnetSubnet2RouteTableFA80824D"
+          },
+          {
+            "Ref": "VPCIsolatedSubnetSubnet1RouteTableB955F076"
+          },
+          {
+            "Ref": "VPCIsolatedSubnetSubnet2RouteTable27F52BE5"
+          }
+        ],
+        "ServiceName": {
+          "Fn::Join": [
+            "",
+            [
+              "com.amazonaws.",
+              {
+                "Ref": "AWS::Region"
+              },
+              ".s3"
+            ]
+          ]
+        },
+        "VpcEndpointType": "Gateway",
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/S3Endpoint/Resource"
+      }
+    },
+    "VPCDynamoDBEndpoint7443A79B": {
+      "Type": "AWS::EC2::VPCEndpoint",
+      "Properties": {
+        "RouteTableIds": [
+          {
+            "Ref": "VPCPrivateSubnetSubnet1RouteTable1A8C9EC2"
+          },
+          {
+            "Ref": "VPCPrivateSubnetSubnet2RouteTableE320E269"
+          },
+          {
+            "Ref": "VPCPublicSubnetSubnet1RouteTableF5AA07ED"
+          },
+          {
+            "Ref": "VPCPublicSubnetSubnet2RouteTableFA80824D"
+          },
+          {
+            "Ref": "VPCIsolatedSubnetSubnet1RouteTableB955F076"
+          },
+          {
+            "Ref": "VPCIsolatedSubnetSubnet2RouteTable27F52BE5"
+          }
+        ],
+        "ServiceName": {
+          "Fn::Join": [
+            "",
+            [
+              "com.amazonaws.",
+              {
+                "Ref": "AWS::Region"
+              },
+              ".dynamodb"
+            ]
+          ]
+        },
+        "VpcEndpointType": "Gateway",
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/VPC/DynamoDBEndpoint/Resource"
+      }
+    },
+    "PublicSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Default Public Security Group.",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1"
+          }
+        ],
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "-",
+            "FromPort": 80,
+            "IpProtocol": "tcp",
+            "ToPort": 80
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "-",
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "ToPort": 443
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/PublicSecurityGroup/Resource"
+      }
+    },
+    "PublicSecurityGroupfromThreeLayerSubnetsPrivateSecurityGroupCEB9431CALLTRAFFIC6A0751F8": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "Description": "Allow All traffic from Private Security Group to Public Security Group.",
+        "GroupId": {
+          "Fn::GetAtt": ["PublicSecurityGroup", "GroupId"]
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": ["PrivateSecurityGroup", "GroupId"]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/PublicSecurityGroup/from ThreeLayerSubnetsPrivateSecurityGroupCEB9431C:ALL TRAFFIC"
+      }
+    },
+    "PublicSecurityGroupfromThreeLayerSubnetsPublicSecurityGroupB5FF3AEEALLTRAFFIC3FFDF38F": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "Description": "Allow All traffic from Public Security Group to Public Security Group.",
+        "GroupId": {
+          "Fn::GetAtt": ["PublicSecurityGroup", "GroupId"]
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": ["PublicSecurityGroup", "GroupId"]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/PublicSecurityGroup/from ThreeLayerSubnetsPublicSecurityGroupB5FF3AEE:ALL TRAFFIC"
+      }
+    },
+    "PrivateSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Default Private Security Group.",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/PrivateSecurityGroup/Resource"
+      }
+    },
+    "PrivateSecurityGroupfromThreeLayerSubnetsPublicSecurityGroupB5FF3AEEALLTRAFFICADF04690": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "Description": "Allow All traffic from Public Security Group to Private Security Group.",
+        "GroupId": {
+          "Fn::GetAtt": ["PrivateSecurityGroup", "GroupId"]
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": ["PublicSecurityGroup", "GroupId"]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/PrivateSecurityGroup/from ThreeLayerSubnetsPublicSecurityGroupB5FF3AEE:ALL TRAFFIC"
+      }
+    },
+    "PrivateSecurityGroupfromThreeLayerSubnetsPrivateSecurityGroupCEB9431CALLTRAFFIC457BC590": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "Description": "Allow All traffic from Private Security Group to Private Security Group.",
+        "GroupId": {
+          "Fn::GetAtt": ["PrivateSecurityGroup", "GroupId"]
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": ["PrivateSecurityGroup", "GroupId"]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/PrivateSecurityGroup/from ThreeLayerSubnetsPrivateSecurityGroupCEB9431C:ALL TRAFFIC"
+      }
+    },
+    "PrivateSecurityGroupfromThreeLayerSubnetsIsolatedSecurityGroupD3F68823ALLTRAFFIC0D46AED5": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "Description": "Allow All traffic from Isolated Security Group to Private Security Group.",
+        "GroupId": {
+          "Fn::GetAtt": ["PrivateSecurityGroup", "GroupId"]
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": ["IsolatedSecurityGroup", "GroupId"]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/PrivateSecurityGroup/from ThreeLayerSubnetsIsolatedSecurityGroupD3F68823:ALL TRAFFIC"
+      }
+    },
+    "IsolatedSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Default Isolated Security Group.",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1"
+          }
+        ],
+        "VpcId": {
+          "Ref": "VPC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/IsolatedSecurityGroup/Resource"
+      }
+    },
+    "IsolatedSecurityGroupfromThreeLayerSubnetsPrivateSecurityGroupCEB9431CALLTRAFFIC7960DF2A": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "Description": "Allow All traffic from Private Security Group to Isolated Security Group.",
+        "GroupId": {
+          "Fn::GetAtt": ["IsolatedSecurityGroup", "GroupId"]
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": ["PrivateSecurityGroup", "GroupId"]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/IsolatedSecurityGroup/from ThreeLayerSubnetsPrivateSecurityGroupCEB9431C:ALL TRAFFIC"
+      }
+    },
+    "IsolatedSecurityGroupfromThreeLayerSubnetsIsolatedSecurityGroupD3F68823ALLTRAFFICD6E9085A": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "Description": "Allow All traffic from Isolated Security Group to Isolated Security Group.",
+        "GroupId": {
+          "Fn::GetAtt": ["IsolatedSecurityGroup", "GroupId"]
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": ["IsolatedSecurityGroup", "GroupId"]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/IsolatedSecurityGroup/from ThreeLayerSubnetsIsolatedSecurityGroupD3F68823:ALL TRAFFIC"
+      }
+    },
+    "CDKMetadata": {
+      "Type": "AWS::CDK::Metadata",
+      "Properties": {
+        "Analytics": "v2:deflate64:H4sIAAAAAAAA/32PwW6DQAxEvyX3ZRPoJdcIRRGXFkHFNTKL2zoBL9r1BkVR/r0iIOipp/E8j6xxouO3vd5tYPCRaa5RS7V+lALmqtIvzsFBh4JOweDPaBL9qHozbqo8VXmoWzJlqBllZOtU2CD4CXWLK1/ZwXtrCIQsL+FxOGb5KO8gJxAc4K5yRzcQXA9nLOgYl8DUZHYHETA/HbKomVS9OXLTW2KZo4st0QRHcj85G/pXy39Bxt8OvX+qAr0NzrwKfwTpw/TwH5pabmh87qnYNqgvfnuL9zrZ6Xhz8USRCyzUoS4m/QWbPnehgwEAAA=="
+      },
+      "Metadata": {
+        "aws:cdk:path": "ThreeLayerSubnets/CDKMetadata/Default"
+      }
+    }
+  },
+  "Outputs": {
+    "VpcId": {
+      "Description": "VPC ID",
+      "Value": {
+        "Ref": "VPC"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::StackName"
+              },
+              "::VpcId"
+            ]
+          ]
+        }
+      }
+    },
+    "PublicSubnetIds": {
+      "Description": "Public Subnets Id",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            {
+              "Ref": "VPCPublicSubnetSubnet1Subnet5B243AFA"
+            },
+            ",",
+            {
+              "Ref": "VPCPublicSubnetSubnet2Subnet7ECA4683"
+            }
+          ]
+        ]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::StackName"
+              },
+              "::PublicSubnetIds"
+            ]
+          ]
+        }
+      }
+    },
+    "PrivateSubnetIds": {
+      "Description": "Private Subnets Id",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            {
+              "Ref": "VPCPrivateSubnetSubnet1Subnet7C0C3BA8"
+            },
+            ",",
+            {
+              "Ref": "VPCPrivateSubnetSubnet2Subnet08BBFA55"
+            }
+          ]
+        ]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::StackName"
+              },
+              "::PrivateSubnetIds"
+            ]
+          ]
+        }
+      }
+    },
+    "IsolatedSubnetIds": {
+      "Description": "Isolated Subnets",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            {
+              "Ref": "VPCIsolatedSubnetSubnet1Subnet2C56B669"
+            },
+            ",",
+            {
+              "Ref": "VPCIsolatedSubnetSubnet2Subnet2B8BABEF"
+            }
+          ]
+        ]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::StackName"
+              },
+              "::IsolatedSubnetIds"
+            ]
+          ]
+        }
+      }
+    },
+    "PublicSecurityGroupId": {
+      "Description": "Public Security Group Id",
+      "Value": {
+        "Fn::GetAtt": ["PrivateSecurityGroup", "GroupId"]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::StackName"
+              },
+              "::PublicSecurityGroupId"
+            ]
+          ]
+        }
+      }
+    },
+    "PrivateSecurityGroupId": {
+      "Description": "Private Security Group Id",
+      "Value": {
+        "Fn::GetAtt": ["PrivateSecurityGroup", "GroupId"]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::StackName"
+              },
+              "::PrivateSecurityGroupId"
+            ]
+          ]
+        }
+      }
+    },
+    "IsolatedSecurityGroupId": {
+      "Description": "Isolated Security Group Id",
+      "Value": {
+        "Fn::GetAtt": ["IsolatedSecurityGroup", "GroupId"]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "AWS::StackName"
+              },
+              "::IsolatedSecurityGroupId"
+            ]
+          ]
+        }
+      }
+    }
+  }
+}
