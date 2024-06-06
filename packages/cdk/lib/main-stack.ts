@@ -18,6 +18,7 @@ import {
   Fn,
   Stack,
   StackProps,
+  CfnOutput,
   CfnParameter,
   CfnDynamicReference,
   CfnDynamicReferenceService,
@@ -26,7 +27,9 @@ import {
   aws_cloudformation as cloudformation,
 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { describe } from 'node:test';
 
+const assetUrl = "https://aws-gcr-solutions.s3.amazonaws.com/WCH-TEST/trackingemailengagement";
 export interface MainProps extends StackProps {
 }
 
@@ -67,7 +70,7 @@ export class MainStack extends Stack {
       parameters: {
         IPv4CIDR: IPv4CIDR.valueAsString,
       },
-      templateUrl: `${__dirname}/templates/ThreeLayerSubnets.template.json`,
+      templateUrl: `${assetUrl}/template/ThreeLayerSubnets.template.json`,
     });
     VPCStack.overrideLogicalId('VPC');
 
@@ -80,6 +83,10 @@ export class MainStack extends Stack {
       VPCStack.logicalId,
       `Outputs.PublicSecurityGroupId`,
     ).toString();
+
+    const securityGroup = ec2.SecurityGroup.fromSecurityGroupId(this, 'PublicSecurityGroup', publicSecurityGroupId, {});
+
+    securityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(80));
 
     const installationInstanceImageId = new CfnDynamicReference(
       CfnDynamicReferenceService.SSM,
@@ -121,7 +128,7 @@ export class MainStack extends Stack {
           Fn.split('/', cfnIamInstanceProfile.attrArn),
         ),
         imageId: installationInstanceImageId.toString(),
-        instanceType: 't4g.nano',
+        instanceType: 'c7g.xlarge',
         securityGroupIds: [publicSecurityGroupId],
         subnetId: Fn.select(0, Fn.split(',', publicSubnetIds)),
         userData: Fn.base64(
@@ -131,6 +138,11 @@ export class MainStack extends Stack {
     );
     cfnInstallationInstance.overrideLogicalId('InstallationInstance');
     cfnInstallationInstance.addDependency(cfnIamInstanceProfile);
+
+    new CfnOutput(this, 'Host', {
+      description: 'Host',
+      value: `http://${cfnInstallationInstance.attrPublicIp}:80`,
+    }).overrideLogicalId('Host');
 
   }
 }
