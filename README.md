@@ -1,12 +1,14 @@
 # dify-on-aws
 
-one-click deploy dify on aws
+one-click deploy Dify Self hosted Edition on EC2
 
 ```
-# 复制 local.template.env 文件，填写ak sk、AWS region
-# cp ./local.template.env ./local.env
-
+# clone repo
 yarn install
 cd packages/cdk
 cdk deploy
+
+# Dify url：Cloudformation output
 ```
+
+![1717651748399](images/README/1717651748399.png)
