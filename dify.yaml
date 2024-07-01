@@ -14,10 +14,6 @@ Parameters:
     Default: "10.1"
     AllowedPattern: ^(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
     Description: The subnet CIDR prefix, such as 10.1, defaults to a subnet mask of /16.
-  BootstrapVersion:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: /cdk-bootstrap/hnb659fds/version
-    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
 Resources:
   VPC:
     Type: AWS::CloudFormation::Stack
@@ -197,16 +193,3 @@ Conditions:
           - Fn::Equals:
               - Ref: AWS::Region
               - us-west-2
-Rules:
-  CheckBootstrapVersion:
-    Assertions:
-      - Assert:
-          Fn::Not:
-            - Fn::Contains:
-                - - "1"
-                  - "2"
-                  - "3"
-                  - "4"
-                  - "5"
-                - Ref: BootstrapVersion
-        AssertDescription: CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.
