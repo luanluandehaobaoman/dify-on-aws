@@ -28,3 +28,5 @@ http:<ec2 public IP> //xx.xx.xx.xx:80
 
 ![1717651748399](images/README/1717651748399.png)
 
+## Dify Workshop with Amazon Bedrock & Sagemaker
+[Rapidly Build GenAI Apps with Dify](https://catalog.us-east-1.prod.workshops.aws/workshops/2c19fcb1-1f1c-4f52-b759-0ca4d2ae2522/zh-CN)
